@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ru.miit.kislab6.mapper.DeanatMapper">
+    <resultMap id="DeanatResultMap" type="ru.miit.kislab6.model.Deanat">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="address" column="address"/>
+        <result property="phone" column="phone"/>
+    </resultMap>
+
+    <select id="selectAllDeanats" resultMap="DeanatResultMap">
+        SELECT id, name, address, phone FROM deanats ORDER BY id
+    </select>
+
+    <select id="selectDeanatById" parameterType="int" resultMap="DeanatResultMap">
+        SELECT id, name, address, phone FROM deanats WHERE id = #{id}
+    </select>
+
+    <insert id="insertDeanat" parameterType="ru.miit.kislab6.model.Deanat" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO deanats (name, address, phone)
+        VALUES (#{name}, #{address}, #{phone})
+    </insert>
+
+    <update id="updateDeanat" parameterType="ru.miit.kislab6.model.Deanat">
+        UPDATE deanats
+        SET name = #{name}, address = #{address}, phone = #{phone}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteDeanatById" parameterType="int">
+        DELETE FROM deanats WHERE id = #{id}
+    </delete>
+</mapper>
