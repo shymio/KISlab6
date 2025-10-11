@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@OpenAPIDefinition(info = @Info(title = "KISlab6 API", version = "v1", description = "API для лабораторной работы №7"))
+@OpenAPIDefinition(info = @Info(title = "Лабораторная работа 7", description = "API для работы с деканатами"))
 public class KiSlab6Application {
 
     public static void main(String[] args) {
