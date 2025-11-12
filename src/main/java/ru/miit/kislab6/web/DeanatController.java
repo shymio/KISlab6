@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/deanats")
+@CrossOrigin(origins = "http://localhost:3000")
 @Tag(name = "Deanats", description = "Операции с деканатами")
 public class DeanatController {
 
