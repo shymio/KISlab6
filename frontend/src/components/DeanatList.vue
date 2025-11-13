@@ -1,238 +1,232 @@
-  <template>
-      <div class="deanats-container">
-        <div class="header">
-          <h1>Список деканатов</h1>
-          <button @click="goToCreate" class="btn btn-primary">
-            + Добавить деканат
-          </button>
-        </div>
+<template>
+  <div class="dashboard">
+    <header class="dashboard-header">
+      <h1>Список деканатов</h1>
+      <button @click="goToCreate" class="btn-add">➕ Новый деканат</button>
+    </header>
 
-        <div v-if="loading" class="loading">Загрузка...</div>
+    <div v-if="loading" class="status-message">🔄 Загрузка данных...</div>
+    <div v-else-if="error" class="status-message error">⚠️ {{ error }}</div>
 
-        <div v-else-if="error" class="error">
-          Ошибка при загрузке данных: {{ error }}
-        </div>
+    <div v-else class="cards-container">
+      <div v-if="deanats.length === 0" class="status-message">🗂️ Деканатов пока нет</div>
 
-        <div v-else class="deanats-list">
-          <div v-if="deanats.length === 0" class="empty-state">
-            Нет данных о деканатах
+      <div v-else class="cards-grid">
+        <div
+          v-for="deanat in deanats"
+          :key="deanat.id"
+          class="deanat-card"
+        >
+          <div class="card-top" @click="viewDetails(deanat.id)">
+            <h2>{{ deanat.name }}</h2>
           </div>
 
-          <div v-else class="cards-grid">
-            <div
-              v-for="deanat in deanats"
-              :key="deanat.id"
-              class="deanat-card"
-            >
-              <div class="card-header">
-                <h3>{{ deanat.name }}</h3>
-                <div class="card-actions">
-                  <button
-                    @click="viewDetails(deanat.id)"
-                    class="btn btn-info"
-                    title="Просмотреть"
-                  >
-                    👁️
-                  </button>
-                  <button
-                    @click="editDeanat(deanat.id)"
-                    class="btn btn-warning"
-                    title="Редактировать"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    @click="deleteDeanat(deanat.id)"
-                    class="btn btn-danger"
-                    title="Удалить"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
+          <div class="card-content" @click="viewDetails(deanat.id)">
+            <p><strong>Адрес:</strong> {{ deanat.address }}</p>
+            <p><strong>Телефон:</strong> {{ deanat.phone }}</p>
+          </div>
 
-              <div class="card-body">
-                <p><strong>Адрес:</strong> {{ deanat.address }}</p>
-                <p><strong>Телефон:</strong> {{ deanat.phone }}</p>
-              </div>
-            </div>
+          <div class="card-actions">
+            <button class="btn-edit" @click.stop="editDeanat(deanat.id)">
+              Редактировать
+            </button>
+            <button class="btn-delete" @click.stop="deleteDeanat(deanat.id)">
+              🗑️
+            </button>
           </div>
         </div>
       </div>
-    </template>
+    </div>
+  </div>
+</template>
 
-    <script>
-    import { deanatService } from '../services/deanatService'
+<script>
+import { deanatService } from '../services/deanatService'
 
-    export default {
-      name: 'DeanatList',
-      data() {
-        return {
-          deanats: [],
-          loading: false,
-          error: null
-        }
-      },
-      async mounted() {
-        await this.loadDeanats()
-      },
-      methods: {
-        async loadDeanats() {
-          this.loading = true
-          this.error = null
-          try {
-            this.deanats = await deanatService.getAllDeanats()
-          } catch (error) {
-            this.error = error.message
-          } finally {
-            this.loading = false
-          }
-        },
-
-        goToCreate() {
-          this.$router.push('/create')
-        },
-
-        viewDetails(id) {
-          this.$router.push(`/details/${id}`)
-        },
-
-        editDeanat(id) {
-          this.$router.push(`/edit/${id}`)
-        },
-
-        async deleteDeanat(id) {
-          if (confirm('Вы уверены, что хотите удалить этот деканат?')) {
-            try {
-              await deanatService.deleteDeanat(id)
-              await this.loadDeanats() // Перезагружаем список
-            } catch (error) {
-              alert('Ошибка при удалении деканата: ' + error.message)
-            }
-          }
+export default {
+  name: 'DeanatList',
+  data() {
+    return {
+      deanats: [],
+      loading: false,
+      error: null
+    }
+  },
+  async mounted() {
+    await this.loadDeanats()
+  },
+  methods: {
+    async loadDeanats() {
+      this.loading = true
+      this.error = null
+      try {
+        this.deanats = await deanatService.getAllDeanats()
+      } catch (error) {
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    },
+    goToCreate() {
+      this.$router.push('/create')
+    },
+    viewDetails(id) {
+      this.$router.push(`/details/${id}`)
+    },
+    editDeanat(id) {
+      this.$router.push(`/edit/${id}`)
+    },
+    async deleteDeanat(id) {
+      if (confirm('Вы уверены, что хотите удалить этот деканат?')) {
+        try {
+          await deanatService.deleteDeanat(id)
+          await this.loadDeanats()
+        } catch (error) {
+          alert('Ошибка при удалении деканата: ' + error.message)
         }
       }
     }
-    </script>
+  }
+}
+</script>
 
-    <style scoped>
-    .deanats-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
+<style scoped>
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(145deg, #f0f4ff, #e0f7fa);
+  min-height: 100vh;
+}
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
 
-    .header h1 {
-      color: #333;
-    }
+.dashboard-header h1 {
+  font-size: 2rem;
+  color: #1a1a2e;
+  letter-spacing: 1px;
+}
 
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 20px;
-    }
+.btn-add {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
 
-    .deanat-card {
-      background: white;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      border-left: 4px solid #007bff;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
+.btn-add:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
 
-    .deanat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    }
+.status-message {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #333;
+  padding: 50px 0;
+}
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 15px;
-    }
+.status-message.error {
+  color: #d32f2f;
+}
 
-    .card-header h3 {
-      margin: 0;
-      color: #333;
-      flex: 1;
-      margin-right: 10px;
-    }
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
 
-    .card-actions {
-      display: flex;
-      gap: 5px;
-    }
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
 
-    .card-body p {
-      margin: 8px 0;
-      color: #666;
-    }
+.deanat-card {
+  background: linear-gradient(145deg, #ffffff, #e3f2fd);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
-    .btn {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background-color 0.2s;
-    }
+.deanat-card:hover {
+  transform: translateY(-5px) rotate(-1deg);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
 
-    .btn-primary {
-      background-color: #007bff;
-      color: white;
-    }
+.card-top h2 {
+  font-size: 1.5rem;
+  color: #0d1b2a;
+  margin: 0 0 20px 0;
+}
 
-    .btn-primary:hover {
-      background-color: #0056b3;
-    }
+.card-content p {
+  font-size: 1rem;
+  color: #1b1b3a;
+  margin: 8px 0;
+}
 
-    .btn-info {
-      background-color: #17a2b8;
-      color: white;
-    }
+.card-content strong {
+  color: #0d1b2a;
+}
 
-    .btn-info:hover {
-      background-color: #138496;
-    }
+/* Новые кнопки действий */
+.card-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+  justify-content: center;
+}
 
-    .btn-warning {
-      background-color: #ffc107;
-      color: #212529;
-    }
+.btn-edit, .btn-delete {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
 
-    .btn-warning:hover {
-      background-color: #e0a800;
-    }
+.btn-edit {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+}
 
-    .btn-danger {
-      background-color: #dc3545;
-      color: white;
-    }
+.btn-edit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
 
-    .btn-danger:hover {
-      background-color: #c82333;
-    }
+.btn-delete {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: white;
+  font-size: 1.3rem; /* увеличиваем корзину */
+  justify-content: center;
+}
 
-    .loading, .error, .empty-state {
-      text-align: center;
-      padding: 40px;
-      font-size: 18px;
-    }
+.btn-delete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+</style>
 
-    .error {
-      color: #dc3545;
-    }
-
-    .empty-state {
-      color: #666;
-    }
-    </style>
