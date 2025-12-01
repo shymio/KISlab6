@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ru.miit.kislab6.mapper.SettlementMapper">
+
+    <resultMap id="SettlementResultMap" type="ru.miit.kislab6.model.Settlement">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="postalIndex" column="postal_index"/>
+        <result property="population" column="population"/>
+        <result property="phone" column="phone"/>
+        <result property="area" column="area"/>
+        <result property="oktmo" column="oktmo"/>
+        <result property="density" column="density"/>
+    </resultMap>
+
+    <select id="selectAllSettlements" resultMap="SettlementResultMap">
+        SELECT * FROM settlements ORDER BY id
+    </select>
+
+    <select id="selectSettlementById" parameterType="int" resultMap="SettlementResultMap">
+        SELECT * FROM settlements WHERE id = #{id}
+    </select>
+
+    <insert id="insertSettlement" parameterType="ru.miit.kislab6.model.Settlement" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO settlements (name, type, postal_index, population, phone, area, oktmo, density)
+        VALUES (#{name}, #{type}, #{postalIndex}, #{population}, #{phone}, #{area}, #{oktmo}, #{density})
+    </insert>
+
+    <update id="updateSettlement" parameterType="ru.miit.kislab6.model.Settlement">
+        UPDATE settlements
+        SET name=#{name}, type=#{type}, postal_index=#{postalIndex}, population=#{population},
+        phone=#{phone}, area=#{area}, oktmo=#{oktmo}, density=#{density}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteSettlementById" parameterType="int">
+        DELETE FROM settlements WHERE id=#{id}
+    </delete>
+
+</mapper>
